@@ -3,7 +3,11 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true }
+  password: { type: String, required: true },
+  accountBalance: { type: Number, default: 0 }, // Added account balance with a default of 0
+  accountNumber: { type: String, required: true, unique: true }, // Added account number, ensure uniqueness
+  // Optional: Consider how you'll store transaction history. This could be an array of transaction IDs, for example.
+  transactionHistory: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }]
 });
 
 // Pre-save hook to hash password
@@ -20,4 +24,3 @@ userSchema.methods.comparePassword = function(candidatePassword) {
 };
 
 module.exports = mongoose.model('User', userSchema);
-

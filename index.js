@@ -2,13 +2,14 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('./models/Users');
+// Assume Transaction model is defined similar to User
+const Transaction = require('./models/Transaction');
 const jwt = require('jsonwebtoken');
 const app = express();
 const cors = require('cors');
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
-
 app.use(cors());
 
 mongoose.connect(process.env.DB_URI)
@@ -26,14 +27,23 @@ app.get('/health', (req, res) => {
 
 // Welcome Page
 app.get('/', (req, res) => {
-  res.send('<h1>Welcome to our fun little Fintech Experiment Backend!</h1><p>Wow the backup is up and running.</p>');
+  res.send('<h1>Welcome to our fun little Fintech Experiment Backend!</h1><h2>Wow the backend is up and running.</h2>');
 });
+
+// Generate a unique account number
+const generateAccountNumber = () => {
+  const prefix = 'ACC';
+  const timeStamp = Date.now().toString();
+  const randomNumber = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `${prefix}${timeStamp}${randomNumber}`;
+};
 
 // Registration route
 app.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = new User({ email, password });
+    const accountNumber = generateAccountNumber();
+    const user = new User({ email, password, accountNumber, accountBalance: 0 });
     await user.save();
     res.status(201).send({ user });
   } catch (error) {
@@ -69,15 +79,45 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
+app.get('/user-data', authenticateToken, async (req, res) => {
+  try {
+    // The user's ID is extracted from the token in the authenticateToken middleware
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send({ error: 'User not found' });
+    }
+
+    // Send back the user data you need on the frontend. Adjust according to your user model.
+    // For example, sending back email, accountNumber, and accountBalance
+    res.status(200).send({
+      email: user.email,
+      accountNumber: user.accountNumber,
+      accountBalance: user.accountBalance,
+      // You can include other user-related data here as needed
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ error: 'An error occurred while fetching user data.' });
+  }
+});
+
+// Placeholder for transaction handling logic
+// This function should be defined based on your actual transaction logic
+const handleTransaction = async (senderId, receiverId, amount) => {
+  // Implement transaction logic here
+};
+
 // Route to create a transaction
 app.post('/transaction', authenticateToken, async (req, res) => {
-  const { amount, type } = req.body;
-  const transaction = new Transaction({ amount, type, userId: req.user._id });
+  const { receiverId, amount } = req.body; // Assuming you pass receiver's ID and the amount
+  const senderId = req.user._id; // Extract sender's ID from token authentication
   try {
-    await transaction.save();
-    res.status(201).send(transaction);
+    await handleTransaction(senderId, receiverId, amount); // Implement your transaction logic
+    res.status(201).send({ message: "Transaction successful" });
   } catch (error) {
-    res.status(400).send(error);
+    res.status(400).send(error.message);
   }
 });
 
