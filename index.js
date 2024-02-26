@@ -25,7 +25,7 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Service is up and running' });
 });
 //  check user route
-app.get('/user', (req, res) => {
+app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'The user is on' });
 });
 
