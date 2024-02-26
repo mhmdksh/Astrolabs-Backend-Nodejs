@@ -25,6 +25,12 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Service is up and running' });
 });
 
+app.get('/Userinfo', async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  res.send("<h1>Welcome</h1>",user ,"<br> to the user information page");
+});
+
 // Welcome Page
 app.get('/', (req, res) => {
   res.send('<h1>Welcome to our fun little Fintech Experiment Backend!</h1><h2>Wow the backend is up and running.</h2>');
