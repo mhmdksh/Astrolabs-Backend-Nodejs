@@ -24,9 +24,10 @@ app.listen(PORT, () => {
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Service is up and running' });
 });
-//  check user route
-app.get('/user', (req, res) => {
-  res.status(200).json({ status: 'ok', message: 'The user is on' });
+
+app.get('/Userinfo', async (req, res) => {
+
+  res.send("<h1>Welcome to user information page</h1>");
 });
 
 // Welcome Page
