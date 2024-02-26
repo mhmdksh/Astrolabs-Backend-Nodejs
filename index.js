@@ -25,6 +25,11 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', message: 'Service is up and running' });
 });
 
+// Check Me route
+app.get('/check-me', (req, res) => {
+  res.status(200).json({ status: 'ok', message: 'Im and Awesome Backend' });
+});
+
 // Welcome Page
 app.get('/', (req, res) => {
   res.send('<h1>Welcome to our fun little Fintech Experiment Backend!</h1><h2>Wow the backend is up and running.</h2>');
