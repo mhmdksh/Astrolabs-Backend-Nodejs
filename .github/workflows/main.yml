@@ -68,7 +68,6 @@ jobs:
           key: ${{ secrets.MY_PRIVATE_KEY }}
           port: 22
           script: |
-            sudo su
             cd ~/Astrolabs-Backend-Nodejs
             docker compose down
             docker compose pull
