@@ -1,8 +1,8 @@
 version: '3'
 services:
   backend:
+    image: eddsnx3/astro-backend
     container_name: backend
-    build: .
     ports:
       - "3000:3000"
     env_file:

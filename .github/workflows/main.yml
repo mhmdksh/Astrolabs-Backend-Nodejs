@@ -65,12 +65,12 @@ jobs:
         with:
           host: ${{ secrets.MY_HOST }}
           username: ${{ secrets.MY_USERNAME }}
-          key: ${{ secrets.MY_PRIVATE_KEY_ALL }}
-          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.MY_PRIVATE_KEY }}
+          port: 22
           script: |
             sudo su
             cd ~/Astrolabs-Backend-Nodejs
             docker compose down
-            git pull
-            docker compose up -d --build
+            docker compose pull
+            docker compose up -d
             docker image prune -a --force
