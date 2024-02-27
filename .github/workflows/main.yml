@@ -1,0 +1,74 @@
+name: backend-pipeline
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      # Label used to access the service container
+      mongodb:
+        # Docker Hub image
+        image: mongo
+        env:
+          MONGO_INITDB_ROOT_USERNAME: admin
+          MONGO_INITDB_ROOT_PASSWORD: admin
+          MONGO_INITDB_DATABASE: astro-db
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18.19.1
+      - name: Install dependencies
+        run: npm install
+        env:
+          DB_URI: mongodb://mongodb:27017/astro-db
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+
+  publish:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Build image and push to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+          registry: ghcr.io
+          repository: mhmdksh/Astrolabs-Backend-Nodejs
+          add_git_labels: true
+          tag_with_ref: true
+          tag_with_sha: true
+
+  deploy:
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH and Redeploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.MY_HOST }}
+          username: ${{ secrets.MY_USERNAME }}
+          key: ${{ secrets.MY_PRIVATE_KEY_ALL }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            sudo su
+            cd ~/Astrolabs-Backend-Nodejs
+            docker compose down
+            git pull
+            docker compose up -d --build
+            docker image prune -a --force
