@@ -1,0 +1,19 @@
+Here is my code snippet:
+
+app.get('/userinfo', async (req, res) => {
+  try {
+    const users = await User.find({}, ''); // Fetch all users and only retrieve the 'astro' database field
+    res.json(users);
+    res.send( '<h1>This is all the user info from the database: <h1>' );
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+Here is my current output:
+
+```
+[{"_id":"65dce2e49f5d6e4537fc7aad","email":"sarah12@g.com","password":"$2a$08$i/7Lgc31DegjH6YNe1R//u1sFPWSHRZp1pUqIUa5YdwPLX56mDQHW","accountBalance":0,"accountNumber":"ACC17089748206955012","transactionHistory":[],"__v":0},{"_id":"65dce3279f5d6e4537fc7ab4","email":"121212@gmail.com","password":"$2a$08$qdK8lH2c1DjbfpNV8yXEh.747bgS2W6tNjA5Jfgilt.ghhEHtYOMq","accountBalance":0,"accountNumber":"ACC17089748876840083","transactionHistory":[],"__v":0}]
+```

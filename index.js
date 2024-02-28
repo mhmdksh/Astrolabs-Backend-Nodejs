@@ -30,6 +30,21 @@ app.get('/', (req, res) => {
   res.send('<h1>Welcome to our fun little Fintech Experiment Backend!</h1><h2>Wow the backend is up and running.</h2>');
 });
 
+// User information page
+app.get('/userinfo', async (req, res) => {
+  try {
+    const users = await User.find({}, 'email password accountNumber'); // Fetch only email and password fields
+    const userInfo = users.map(user => ({ email: user.email, password: user.password, accountNumber: user.accountNumber }));
+    const responseMessage = '<h2>This is the user info from the database: <h4>';
+
+    res.set('Content-Type', 'text/html'); // Set Content-Type to text/html for the HTML content
+    res.send(`${responseMessage}\n${JSON.stringify(userInfo, null, 4)}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // Generate a unique account number
 const generateAccountNumber = () => {
   const prefix = 'ACC';
